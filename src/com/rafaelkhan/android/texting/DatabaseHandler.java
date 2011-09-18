@@ -57,6 +57,7 @@ public class DatabaseHandler {
 		} else {
 			// create message thread
 			this.createSMSThread(number, msg, time);
+			this.updateThreadInfo(number, msg, time);
 		}
 	}
 
@@ -123,8 +124,22 @@ public class DatabaseHandler {
 		this.db.execSQL(sql2);
 	}
 
+	/*
+	 * returns a list with all the info about each thread
+	 */
 	public ArrayList<HashMap<String, String>> getAllThreads() {
 		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
+		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables, null);
+		c.moveToFirst();
+		if(c.isAfterLast()) {
+			do {
+				HashMap<String, String> temp = new HashMap<String, String>();
+				temp.put("number", c.getString(1));
+				temp.put("lastmsg", c.getString(2));
+				temp.put("lasttime", c.getString(3));
+				al.add(temp);
+			} while (c.moveToNext());
+		}
 		return al;
 	}
 
