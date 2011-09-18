@@ -40,7 +40,7 @@ public class DatabaseHandler {
 	 * Creates the table that holds all unique numbers
 	 */
 	private void createThreadTable() {
-		String newTable = "CREATE TABLE IF NOT EXIST "
+		String newTable = "CREATE TABLE IF NOT EXISTS "
 				+ this.allThreadTables
 				+ "(_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
 		this.db.execSQL(newTable);
@@ -116,10 +116,10 @@ public class DatabaseHandler {
 	 * Updates the last message and time of a thread
 	 */
 	private void updateThreadInfo(String number, String msg, String time) {
-		String sql = "UPDATE " + this.allThreadTables + " SET LastMsg = \'" + msg
-				+ "\' WHERE Number = \'" + number + "\'";
-		String sql2 = "UPDATE " + this.allThreadTables + " SET LastTime = \'" + time
-				+ "\' WHERE Number = \'" + number + "\'";
+		String sql = "UPDATE " + this.allThreadTables + " SET LastMsg = \'"
+				+ msg + "\' WHERE Number = \'" + number + "\'";
+		String sql2 = "UPDATE " + this.allThreadTables + " SET LastTime = \'"
+				+ time + "\' WHERE Number = \'" + number + "\'";
 		this.db.execSQL(sql);
 		this.db.execSQL(sql2);
 	}
@@ -129,15 +129,27 @@ public class DatabaseHandler {
 	 */
 	public ArrayList<HashMap<String, String>> getAllThreads() {
 		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
-		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables, null);
+
+		// New message, list entry
+		HashMap<String, String> newMsg = new HashMap<String, String>();
+		newMsg.put("number", "New message");
+		newMsg.put("lastmsg", "Compose a new message");
+		newMsg.put("lasttime", "");
+		al.add(newMsg);
+
+		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables,
+				null);
 		c.moveToFirst();
-		if(c.isAfterLast()) {
+		if (c.isAfterLast()) {
 			do {
 				HashMap<String, String> temp = new HashMap<String, String>();
-				temp.put("number", c.getString(1));
-				temp.put("lastmsg", c.getString(2));
-				temp.put("lasttime", c.getString(3));
-				al.add(temp);
+				try {
+					temp.put("number", c.getString(1));
+					temp.put("lastmsg", c.getString(2));
+					temp.put("lasttime", c.getString(3));
+					al.add(temp);
+				} catch (Exception e) { // if columns are empty
+				}
 			} while (c.moveToNext());
 		}
 		return al;
