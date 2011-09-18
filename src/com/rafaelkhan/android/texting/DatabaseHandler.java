@@ -1,10 +1,29 @@
 package com.rafaelkhan.android.texting;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/*
+ * HOW THIS WORKS
+ * 
+ * DB:
+ * 	- One table holds all the information about a thread.
+ * 	  The phone number of the other person, the last message sent,
+ * 	  and the time of the last message.
+ * 
+ *  - Each phone number has it's own table, each entry contains the sender, 
+ *    a message, and the time it was sent
+ * 
+ * Receiving:
+ * 	1. Service receives message, and calls onSMSReceive
+ * 	2. Then adds the thread to the table with all Threads names and info
+ *  3. 
+ */
 public class DatabaseHandler {
 
 	private String dbName = "textingdb";
@@ -21,8 +40,9 @@ public class DatabaseHandler {
 	 * Creates the table that holds all unique numbers
 	 */
 	private void createThreadTable() {
-		String newTable = "CREATE TABLE IF NOT EXIST " + this.allThreadTables
-				+ "(_id INTEGER PRIMARY KEY, Number VARCHAR);";
+		String newTable = "CREATE TABLE IF NOT EXIST "
+				+ this.allThreadTables
+				+ "(_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
 		this.db.execSQL(newTable);
 	}
 
@@ -30,12 +50,13 @@ public class DatabaseHandler {
 	 * Handles sms messages when received
 	 */
 	public void onSMSReceive(String number, String msg, String time) {
-		if(checkThreadExistance(number)) {
-			//add message to thread
+		if (checkThreadExistance(number)) {
+			// add message to thread
+			this.insertIntoThread(number, msg, time);
+			this.updateThreadInfo(number, msg, time);
 		} else {
-			//create message thread
-			this.addThreadToList(number);
-			this.createSMSThread(number);
+			// create message thread
+			this.createSMSThread(number, msg, time);
 		}
 	}
 
@@ -58,25 +79,53 @@ public class DatabaseHandler {
 	}
 
 	/*
+	 * Inserts SMS data into its respective table
+	 */
+	private void insertIntoThread(String number, String msg, String time) {
+		String sql = "INSERT INTO " + number + " values (null, \'" + number
+				+ "\',\'" + msg + "\',\'" + time + "\');";
+		this.db.execSQL(sql);
+	}
+
+	/*
 	 * Creates a table to store the SMS messages for each unique phone number.
 	 * 
 	 * The phone number is then added to the table that stores all the unique
 	 * numbers
 	 */
-	private void createSMSThread(String phoneNumber) {
+	private void createSMSThread(String phoneNumber, String msg, String time) {
 		String newTable = "CREATE TABLE IF NOT EXIST " + phoneNumber
 				+ "(_id INTEGER PRIMARY KEY, Sender VARCHAR,"
 				+ "Message VARCHAR, Time VARCHAR);";
 		this.db.execSQL(newTable);
-		this.addThreadToList(phoneNumber);
+		this.addThreadToList(phoneNumber, msg, time);
 	}
 
 	/*
 	 * Adds unique phone number to table containing all threads
 	 */
-	public void addThreadToList(String phoneNumber) {
-		this.db.execSQL("INSERT INTO " + this.allThreadTables
-				+ " Values (null, \'" + phoneNumber + "\');");
+	private void addThreadToList(String phoneNumber, String msg, String time) {
+		String sql = "INSERT INTO " + this.allThreadTables
+				+ " Values (null, \'" + phoneNumber + "\', \'" + msg + "\', \'"
+				+ time + "\');";
+		this.db.execSQL(sql);
+	}
+
+	/*
+	 * Updates the last message and time of a thread
+	 */
+	private void updateThreadInfo(String number, String msg, String time) {
+		String sql = "UPDATE " + this.allThreadTables + " SET LastMsg = \'" + msg
+				+ "\' WHERE Number = \'" + number + "\'";
+		String sql2 = "UPDATE " + this.allThreadTables + " SET LastTime = \'" + time
+				+ "\' WHERE Number = \'" + number + "\'";
+		this.db.execSQL(sql);
+		this.db.execSQL(sql2);
+	}
+
+	public ArrayList<HashMap<String, String>> getAllThreads() {
+		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
+		return al;
 	}
 
 	public void close() {
