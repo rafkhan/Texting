@@ -127,14 +127,14 @@ public class DatabaseHandler {
 	/*
 	 * returns a list with all the info about each thread
 	 */
-	public ArrayList<HashMap<String, String>> getAllThreads() {
-		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
+	public ArrayList<HashMap<String, Object>> getAllThreads() {
+		ArrayList<HashMap<String, Object>> al = new ArrayList<HashMap<String, Object>>();
 
 		// New message, list entry
-		HashMap<String, String> newMsg = new HashMap<String, String>();
+		HashMap<String, Object> newMsg = new HashMap<String, Object>();
 		newMsg.put("number", "New message");
 		newMsg.put("lastmsg", "Compose a new message");
-		newMsg.put("lasttime", "");
+		newMsg.put("lasttime", null);
 		al.add(newMsg);
 
 		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables,
@@ -142,7 +142,7 @@ public class DatabaseHandler {
 		c.moveToFirst();
 		if (c.isAfterLast()) {
 			do {
-				HashMap<String, String> temp = new HashMap<String, String>();
+				HashMap<String, Object> temp = new HashMap<String, Object>();
 				try {
 					temp.put("number", c.getString(1));
 					temp.put("lastmsg", c.getString(2));

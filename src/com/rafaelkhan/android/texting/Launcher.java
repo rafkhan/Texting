@@ -52,8 +52,20 @@ public class Launcher extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				HashMap<String, Object> hash = (HashMap<String, Object>) parent
-						.getItemAtPosition(position);
+						.getItemAtPosition(position);		
+				Launcher.this.clickHandler(hash);
 			}
 		});
+	}
+	
+	/*
+	 * This is what's called when an item is clicked
+	 */
+	protected void clickHandler(HashMap<String, Object> hash) {
+		if(hash.get("lasttime") == null) {
+			//new message activity
+		} else {
+			//open thread
+		}
 	}
 }
