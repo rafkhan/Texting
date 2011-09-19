@@ -31,7 +31,6 @@ public class Launcher extends Activity {
 	 */
 	private void updateListView() {
 		ListView lv = (ListView) findViewById(R.id.all_thread_listview);
-
 		SimpleAdapter adapter = new SimpleAdapter(this,
 				Launcher.dbhdr.getAllThreads(), R.layout.all_thread_listitem,
 				new String[] { "number", "lastmsg", "lasttime" }, new int[] {
@@ -47,28 +46,40 @@ public class Launcher extends Activity {
 	 */
 	private void setClickListener() {
 		ListView lv = (ListView) findViewById(R.id.all_thread_listview);
-
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			@SuppressWarnings("unchecked")
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				HashMap<String, Object> hash = (HashMap<String, Object>) parent
-						.getItemAtPosition(position);		
+						.getItemAtPosition(position);
 				Launcher.this.clickHandler(hash);
 			}
 		});
 	}
-	
+
 	/*
 	 * This is what's called when an item is clicked
 	 */
 	protected void clickHandler(HashMap<String, Object> hash) {
-		if(hash.get("lasttime") == null) {
+		if (hash.get("lasttime") == null) {
 			Intent i = new Intent();
 			i.setClass(this, ThreadActivity.class);
 			startActivity(i);
 		} else {
-			//open thread
+			//get data from hashmap
+			String number = (String) hash.get("number");
+			String lastmsg = (String) hash.get("lastmsg");
+			String lasttime = (String) hash.get("lasttime");
+			//add data to bundle
+			Bundle b = new Bundle();
+			b.putString("number", number);
+			b.putString("lastmsg", lastmsg);
+			b.putString("lasttime", lasttime);
+			//start intent
+			Intent i = new Intent();
+			i.setClass(this, ThreadActivity.class);
+			i.putExtras(b);
+			startActivity(i);
 		}
 	}
 }
