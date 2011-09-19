@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<EditText 
+		android:id="@+id/phone_number_input"
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:hint="Phone number" 
+		android:visibility="gone">
+		<requestFocus />
+	</EditText>
+	
+	<ScrollView 
+		android:id="@+id/scrollView1"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:layout_weight="1" 
+		android:gravity="bottom">
+		
+		<LinearLayout 
+			android:id="@+id/linearLayout1"
+			android:layout_width="fill_parent" 
+			android:layout_height="fill_parent">
+			
+			<TextView 
+				android:id="@+id/sms_output" 
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+				
+		</LinearLayout>
+		
+	</ScrollView>
+	
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:id="@+id/relativeLayout1" 
+		android:layout_height="wrap_content"
+		android:background="@drawable/gradient"
+		android:padding="3dp">
+		
+		<Button 
+			android:id="@+id/send_button" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:layout_alignParentTop="true"
+			android:layout_alignParentRight="true" 
+			android:layout_alignBottom="@+id/sms_input"
+			android:onClick="sendButton" 
+			android:text="Send" />
+			
+		<EditText 
+			android:layout_marginTop="3dp" 
+			android:id="@+id/sms_input"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:inputType="textMultiLine" 
+			android:layout_alignParentTop="true"
+			android:layout_alignParentLeft="true" 
+			android:layout_toLeftOf="@+id/send_button"
+			android:hint="Type a message..."/>
+			
+	</RelativeLayout>
+	
+</LinearLayout>

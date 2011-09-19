@@ -3,6 +3,7 @@ package com.rafaelkhan.android.texting;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -63,7 +64,9 @@ public class Launcher extends Activity {
 	 */
 	protected void clickHandler(HashMap<String, Object> hash) {
 		if(hash.get("lasttime") == null) {
-			//new message activity
+			Intent i = new Intent();
+			i.setClass(this, ThreadActivity.class);
+			startActivity(i);
 		} else {
 			//open thread
 		}
