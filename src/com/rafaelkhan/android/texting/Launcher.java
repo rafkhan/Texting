@@ -66,16 +66,16 @@ public class Launcher extends Activity {
 			i.setClass(this, ThreadActivity.class);
 			startActivity(i);
 		} else {
-			//get data from hashmap
+			// get data from hashmap
 			String number = (String) hash.get("number");
 			String lastmsg = (String) hash.get("lastmsg");
 			String lasttime = (String) hash.get("lasttime");
-			//add data to bundle
+			// add data to bundle
 			Bundle b = new Bundle();
 			b.putString("number", number);
 			b.putString("lastmsg", lastmsg);
 			b.putString("lasttime", lasttime);
-			//start intent
+			// start intent
 			Intent i = new Intent();
 			i.setClass(this, ThreadActivity.class);
 			i.putExtras(b);

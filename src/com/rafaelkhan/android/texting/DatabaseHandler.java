@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /*
  * HOW THIS WORKS
@@ -22,7 +23,6 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Receiving:
  * 	1. Service receives message, and calls onSMSReceive
  * 	2. Then adds the thread to the table with all Threads names and info
- *  3. 
  */
 public class DatabaseHandler {
 
@@ -42,14 +42,33 @@ public class DatabaseHandler {
 	private void createThreadTable() {
 		String newTable = "CREATE TABLE IF NOT EXISTS "
 				+ this.allThreadTables
-				+ "(_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
+				+ " (_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
 		this.db.execSQL(newTable);
 	}
 
 	/*
 	 * Handles sms messages when received
 	 */
-	public void onSMSReceive(String number, String msg, String time) {
+	public void onSMSReceive(String number, String[] msg, String time) {
+		for (int i = 0; i < msg.length; i++) {
+			msg[i] = this.formatSQL(msg[i]);
+		}
+		if (checkThreadExistance(number)) {
+			// add message to thread
+			this.insertIntoThread(number, msg, time);
+			this.updateThreadInfo(number, msg[0], time);
+		} else {
+			// create message thread
+			this.createSMSThread(number, msg[0], time);
+			// re calls method
+			this.onSMSReceive(number, msg, time);
+		}
+	}
+
+	/*
+	 * Handles sms when sent; number is the receiver
+	 */
+	public void onSMSSend(String number, String msg, String time) {
 		if (checkThreadExistance(number)) {
 			// add message to thread
 			this.insertIntoThread(number, msg, time);
@@ -57,35 +76,51 @@ public class DatabaseHandler {
 		} else {
 			// create message thread
 			this.createSMSThread(number, msg, time);
-			this.updateThreadInfo(number, msg, time);
+			// re call method
+			this.onSMSSend(number, msg, time);
 		}
 	}
 
 	/*
 	 * Checks if a thread already exists
 	 */
-	public boolean checkThreadExistance(String number) {
+	private boolean checkThreadExistance(String number) {
 		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables,
 				null);
 		c.moveToFirst();
-		if (c.isAfterLast()) {
+		if (!c.isAfterLast()) {
 			do {
 				String dbNum = c.getString(1);
 				if (dbNum.equals(number)) {
+					Log.e("dbNum", number);
 					return true;
 				}
 			} while (c.moveToNext());
 		}
+		Log.e("return", "false");
 		return false;
 	}
 
 	/*
 	 * Inserts SMS data into its respective table
+	 * 
+	 * this one is used when you send a message
 	 */
 	private void insertIntoThread(String number, String msg, String time) {
-		String sql = "INSERT INTO " + number + " values (null, \'" + number
+		String sql = "INSERT INTO `" + number + "` values (null, \'" + number
 				+ "\',\'" + msg + "\',\'" + time + "\');";
 		this.db.execSQL(sql);
+	}
+
+	/*
+	 * this is used when you receive a message
+	 */
+	private void insertIntoThread(String number, String[] msg, String time) {
+		for (int i = 0; i < msg.length; i++) {
+			String sql = "INSERT INTO `" + number + "` values (null, \'"
+					+ number + "\',\'" + msg[i] + "\',\'" + time + "\');";
+			this.db.execSQL(sql);
+		}
 	}
 
 	/*
@@ -95,9 +130,9 @@ public class DatabaseHandler {
 	 * numbers
 	 */
 	private void createSMSThread(String phoneNumber, String msg, String time) {
-		String newTable = "CREATE TABLE IF NOT EXIST " + phoneNumber
-				+ "(_id INTEGER PRIMARY KEY, Sender VARCHAR,"
-				+ "Message VARCHAR, Time VARCHAR);";
+		String newTable = "CREATE TABLE IF NOT EXISTS `"
+				+ phoneNumber
+				+ "` (_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
 		this.db.execSQL(newTable);
 		this.addThreadToList(phoneNumber, msg, time);
 	}
@@ -125,6 +160,14 @@ public class DatabaseHandler {
 	}
 
 	/*
+	 * escapes single quotes for db
+	 */
+	private String formatSQL(String s) {
+		s = s.replace("\'", "\'\'");
+		return s;
+	}
+
+	/*
 	 * returns a list with all the info about each thread
 	 */
 	public ArrayList<HashMap<String, Object>> getAllThreads() {
@@ -140,7 +183,7 @@ public class DatabaseHandler {
 		Cursor c = this.db.rawQuery("SELECT * FROM " + this.allThreadTables,
 				null);
 		c.moveToFirst();
-		if (c.isAfterLast()) {
+		if (!c.isAfterLast()) {
 			do {
 				HashMap<String, Object> temp = new HashMap<String, Object>();
 				try {
