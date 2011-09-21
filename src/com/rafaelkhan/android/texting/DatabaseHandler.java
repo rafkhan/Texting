@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 /*
  * HOW THIS WORKS
@@ -23,18 +24,30 @@ import android.util.Log;
  * Receiving:
  * 	1. Service receives message, and calls onSMSReceive
  * 	2. Then adds the thread to the table with all Threads names and info
+ * 
+ * 
+ * THIS ALSO HANDLES CONTACT NAME LOOKUP
  */
 public class DatabaseHandler {
 
 	private String dbName = "textingdb";
 	private String allThreadTables = "allthreads";
 	private SQLiteDatabase db;
+	private Context context;
+	private String contactName;
 
-	public DatabaseHandler(Context context) {
-		DBHelper dbHelper = new DBHelper(context, this.dbName);
+	public DatabaseHandler(Context c) {
+		this.context = c;
+		DBHelper dbHelper = new DBHelper(c, this.dbName);
 		this.db = dbHelper.getWritableDatabase();
+
 		this.createThreadTable();
 	}
+
+	/*
+	 * this.db.execSQL("DROP TABLE " + this.allThreadTables);
+	 * this.db.execSQL("DROP TABLE Me");
+	 */
 
 	/*
 	 * Creates the table that holds all unique numbers
@@ -69,13 +82,17 @@ public class DatabaseHandler {
 	 * Handles sms when sent; number is the receiver
 	 */
 	public void onSMSSend(String number, String msg, String time) {
+		msg = this.formatSQL(msg);
 		if (checkThreadExistance(number)) {
 			// add message to thread
-			this.insertIntoThread(number, msg, time);
+			this.insertIntoThreadAsSelf(number, msg, time);
 			this.updateThreadInfo(number, msg, time);
+
 		} else {
 			// create message thread
 			this.createSMSThread(number, msg, time);
+
+			Toast.makeText(context, "herp", 0).show();
 			// re call method
 			this.onSMSSend(number, msg, time);
 		}
@@ -92,7 +109,7 @@ public class DatabaseHandler {
 			do {
 				String dbNum = c.getString(1);
 				if (dbNum.equals(number)) {
-					Log.e("dbNum", number);
+					Log.e(dbNum, number);
 					return true;
 				}
 			} while (c.moveToNext());
@@ -106,9 +123,9 @@ public class DatabaseHandler {
 	 * 
 	 * this one is used when you send a message
 	 */
-	private void insertIntoThread(String number, String msg, String time) {
-		String sql = "INSERT INTO `" + number + "` values (null, \'" + number
-				+ "\',\'" + msg + "\',\'" + time + "\');";
+	private void insertIntoThreadAsSelf(String number, String msg, String time) {
+		String sql = "INSERT INTO `" + number + "` values (null, \'Me\',\'"
+				+ msg + "\',\'" + time + "\');";
 		this.db.execSQL(sql);
 	}
 
@@ -122,6 +139,10 @@ public class DatabaseHandler {
 			this.db.execSQL(sql);
 		}
 	}
+
+	/*
+	 * this is called when you send a message
+	 */
 
 	/*
 	 * Creates a table to store the SMS messages for each unique phone number.
