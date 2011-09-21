@@ -25,6 +25,10 @@ import android.widget.Toast;
 
 public class ThreadActivity extends Activity {
 
+	/*
+	 * TODO: Make listview start at the bottom
+	 */
+
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 	private String number; // contacts number
 	private Boolean knownNumber; // is this an existing thread or not
@@ -74,10 +78,11 @@ public class ThreadActivity extends Activity {
 			if (!number.equals("Me")) {
 				if (this.contactName == null) { // check only once
 					this.contactName = this.getContactName(number);
-					temp.put("number", this.contactName); // set contact name to
+
 				}
+				temp.put("number", this.contactName); // set contact name to
+														// array list
 			}
-			// arraylist
 			al.set(i, temp);
 		}
 
@@ -159,6 +164,7 @@ public class ThreadActivity extends Activity {
 					this.sendSMS(this.number, message);
 					this.updateListView();
 					this.clearTextInput();
+					this.toggleNumberBarVisibility(false);
 				}
 			}
 		}

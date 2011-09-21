@@ -1,10 +1,14 @@
 package com.rafaelkhan.android.texting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract.PhoneLookup;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -30,12 +34,22 @@ public class Launcher extends Activity {
 	 * Refreshes the contents of the listview
 	 */
 	private void updateListView() {
+		ArrayList<HashMap<String, Object>> al = Launcher.dbhdr.getAllThreads();
+		for (int i = 0; i < al.size(); i++) {
+			HashMap<String, Object> temp = al.get(i);
+			String number = (String) temp.get("number");
+			if (!number.equals("Me")) {
+				number = this.getContactName(number);
+				temp.put("name", number);
+			}
+			al.set(i, temp);
+		}
+
 		ListView lv = (ListView) findViewById(R.id.all_thread_listview);
-		SimpleAdapter adapter = new SimpleAdapter(this,
-				Launcher.dbhdr.getAllThreads(), R.layout.all_thread_listitem,
-				new String[] { "number", "lastmsg", "lasttime" }, new int[] {
-						R.id.contact_textview, R.id.lastmsg_textview,
-						R.id.lasttime_textview });
+		SimpleAdapter adapter = new SimpleAdapter(this, al,
+				R.layout.all_thread_listitem, new String[] { "name", "lastmsg",
+						"lasttime" }, new int[] { R.id.contact_textview,
+						R.id.lastmsg_textview, R.id.lasttime_textview });
 
 		lv.setAdapter(adapter);
 		this.setClickListener();
@@ -80,6 +94,25 @@ public class Launcher extends Activity {
 			i.setClass(this, ThreadActivity.class);
 			i.putExtras(b);
 			startActivity(i);
+		}
+	}
+
+	/*
+	 * Takes a number, and gets the contact name associated with it, if it
+	 * doesn't exist, return the number.
+	 */
+	private String getContactName(String number) {
+		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
+				Uri.encode(number));
+		Cursor c = this.getContentResolver().query(uri,
+				new String[] { PhoneLookup.DISPLAY_NAME, PhoneLookup._ID },
+				null, null, null);
+		if (c.moveToNext()) {
+			String name = c.getString(c
+					.getColumnIndexOrThrow(PhoneLookup.DISPLAY_NAME));
+			return name;
+		} else {
+			return number;
 		}
 	}
 }
