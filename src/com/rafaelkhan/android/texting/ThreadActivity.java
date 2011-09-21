@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 public class ThreadActivity extends Activity {
+
+	public String number;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -14,6 +18,20 @@ public class ThreadActivity extends Activity {
 		setContentView(R.layout.thread_layout);
 
 		this.getBundleInfo();
+		this.updateListView();
+	}
+
+	/*
+	 * Refreshes the contents of the listview
+	 */
+	private void updateListView() {
+		ListView lv = (ListView) findViewById(R.id.sms_thread_list);
+		SimpleAdapter adapter = new SimpleAdapter(this,
+				Launcher.dbhdr.getMessageThread(this.number),
+				R.layout.sms_list_item, new String[] { "number", "lastmsg",
+						"lasttime" }, new int[] { R.id.sender_tv,
+						R.id.message_tv, R.id.time_tv });
+		lv.setAdapter(adapter);
 	}
 
 	/*
@@ -22,7 +40,7 @@ public class ThreadActivity extends Activity {
 	private void getBundleInfo() {
 		Bundle b = this.getIntent().getExtras();
 		if (b != null) {
-			// There is data
+			this.number = b.getString("number");
 		} else {
 			this.toggleNumberBarVisibility(true);
 		}

@@ -13,27 +13,13 @@
 		android:visibility="gone">
 		<requestFocus />
 	</EditText>
-	
-	<ScrollView 
-		android:id="@+id/scrollView1"
-		android:layout_width="fill_parent"
+
+	<ListView 
+		android:id="@+id/sms_thread_list"
 		android:layout_height="wrap_content" 
+		android:layout_width="fill_parent" 
 		android:layout_weight="1" 
-		android:gravity="bottom">
-		
-		<LinearLayout 
-			android:id="@+id/linearLayout1"
-			android:layout_width="fill_parent" 
-			android:layout_height="fill_parent">
-			
-			<TextView 
-				android:id="@+id/sms_output" 
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-				
-		</LinearLayout>
-		
-	</ScrollView>
+		android:gravity="bottom"/>
 	
 	<RelativeLayout
 		android:layout_width="fill_parent"

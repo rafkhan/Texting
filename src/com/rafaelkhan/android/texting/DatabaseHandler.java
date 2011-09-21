@@ -198,6 +198,29 @@ public class DatabaseHandler {
 		return al;
 	}
 
+	/*
+	 * This gets all the data for a single SMS thread
+	 */
+	public ArrayList<HashMap<String, String>> getMessageThread(String number) {
+		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
+		Cursor c = this.db.rawQuery("SELECT * FROM `" + number + "`", null);
+		c.moveToFirst();
+		if (!c.isAfterLast()) {
+			do {
+				HashMap<String, String> temp = new HashMap<String, String>();
+				try {
+					temp.put("id", c.getString(0));
+					temp.put("number", c.getString(1));
+					temp.put("lastmsg", c.getString(2));
+					temp.put("lasttime", c.getString(3));
+					al.add(temp);
+				} catch (Exception e) { // if columns are empty
+				}
+			} while (c.moveToNext());
+		}
+		return al;
+	}
+
 	public void close() {
 		this.db.close();
 	}
