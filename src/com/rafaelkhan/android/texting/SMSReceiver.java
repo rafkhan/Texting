@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 public class SMSReceiver extends BroadcastReceiver {
 
@@ -38,11 +39,12 @@ public class SMSReceiver extends BroadcastReceiver {
 					time);
 
 			Bundle b = new Bundle();
-			b.putString("phone number", sender);
+			b.putString("number", sender);
+			Log.e("derp",sender);
 			b.putString("message", smsStrings[0]);
-			// Intent i = new Intent(context, NotificationService.class);
-			// i.putExtras(b);
-			// context.startService(i);
+			Intent i = new Intent(context, NotificationService.class);
+			i.putExtras(b);
+			context.startService(i);
 		}
 	}
 }
