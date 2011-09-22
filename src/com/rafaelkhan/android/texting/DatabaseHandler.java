@@ -41,7 +41,6 @@ public class DatabaseHandler {
 		this.context = c;
 		DBHelper dbHelper = new DBHelper(c, this.dbName);
 		this.db = dbHelper.getWritableDatabase();
-
 		this.createThreadTable();
 	}
 
@@ -126,7 +125,7 @@ public class DatabaseHandler {
 	 */
 	private void insertIntoThreadAsSelf(String number, String msg, String time) {
 		String sql = "INSERT INTO `" + number + "` values (null, \'Me\',\'"
-				+ msg + "\',\'" + time + "\');";
+				+ msg + "\',\'" + time + "\',\'0\');";
 		this.db.execSQL(sql);
 	}
 
@@ -136,7 +135,7 @@ public class DatabaseHandler {
 	private void insertIntoThread(String number, String[] msg, String time) {
 		for (int i = 0; i < msg.length; i++) {
 			String sql = "INSERT INTO `" + number + "` values (null, \'"
-					+ number + "\',\'" + msg[i] + "\',\'" + time + "\');";
+					+ number + "\',\'" + msg[i] + "\',\'" + time + "\',\'1\');";
 			this.db.execSQL(sql);
 		}
 	}
@@ -154,7 +153,7 @@ public class DatabaseHandler {
 	private void createSMSThread(String phoneNumber, String msg, String time) {
 		String newTable = "CREATE TABLE IF NOT EXISTS `"
 				+ phoneNumber
-				+ "` (_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR);";
+				+ "` (_id INTEGER PRIMARY KEY, Number VARCHAR, LastMsg VARCHAR, LastTime VARCHAR, Read VARCHAR);";
 		this.db.execSQL(newTable);
 		this.addThreadToList(phoneNumber, msg, time);
 	}
@@ -241,6 +240,26 @@ public class DatabaseHandler {
 			} while (c.moveToNext());
 		}
 		return al;
+	}
+
+	public int unreadCount(String number) {
+		int count = 0;
+		Cursor c = this.db.rawQuery("SELECT * FROM `" + number + "`", null);
+		c.moveToFirst();
+		if (!c.isAfterLast()) {
+			do {
+				if (c.getString(4).equals("1")) {
+					count++;
+				}
+			} while (c.moveToNext());
+		}
+		return count;
+	}
+
+	public void setUnread(String number) {
+		String sql = "UPDATE `" + number
+				+ "` SET Read = \'0\' WHERE Read = \'1\'";
+		this.db.execSQL(sql);
 	}
 
 	public void close() {

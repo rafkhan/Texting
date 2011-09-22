@@ -26,8 +26,7 @@ import android.widget.Toast;
 public class ThreadActivity extends Activity {
 
 	/*
-	 * TODO: Make listview start at the bottom
-	 * TODO: MAKE READ / UNREAD SHIT
+	 * TODO: Make listview start at the bottom TODO: MAKE READ / UNREAD SHIT
 	 */
 
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
@@ -45,9 +44,45 @@ public class ThreadActivity extends Activity {
 		if (this.knownNumber) {
 			this.updateListView();
 			this.setTitleWithContact();
+			Launcher.dbhdr.setUnread(this.number);
 		} else {
 			this.toggleNumberBarVisibility(true);
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	public void onStop() {
+		this.updateListView();
+		super.onStop();
+	}
+
+	@Override
+	public void onPause() {
+		if (this.knownNumber) {
+			this.updateListView();
+			this.setTitleWithContact();
+			Launcher.dbhdr.setUnread(this.number);
+		} else {
+			this.toggleNumberBarVisibility(true);
+		}
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		if (this.knownNumber) {
+			this.updateListView();
+			this.setTitleWithContact();
+			Launcher.dbhdr.setUnread(this.number);
+		} else {
+			this.toggleNumberBarVisibility(true);
+		}
+		super.onResume();
 	}
 
 	/*
@@ -202,9 +237,9 @@ public class ThreadActivity extends Activity {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
 					/*
-					Toast.makeText(getBaseContext(), "SMS sent",
-							Toast.LENGTH_SHORT).show();
-					*/
+					 * Toast.makeText(getBaseContext(), "SMS sent",
+					 * Toast.LENGTH_SHORT).show();
+					 */
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
 					Toast.makeText(getBaseContext(), "ERROR: Generic failure",
@@ -232,13 +267,14 @@ public class ThreadActivity extends Activity {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
 					/*
-					Toast.makeText(getBaseContext(), "SMS delivered",
-							Toast.LENGTH_SHORT).show();
-					*/
+					 * Toast.makeText(getBaseContext(), "SMS delivered",
+					 * Toast.LENGTH_SHORT).show();
+					 */
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), "ERROR: SMS not delivered",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getBaseContext(),
+							"ERROR: SMS not delivered", Toast.LENGTH_SHORT)
+							.show();
 					break;
 				}
 			}

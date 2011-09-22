@@ -29,6 +29,29 @@ public class Launcher extends Activity {
 		Launcher.dbhdr = new DatabaseHandler(this);
 		this.updateListView();
 	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	public void onStop() {
+		this.updateListView();
+		super.onStop();
+	}
+	
+	@Override
+	public void onPause() {
+		this.updateListView();
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		this.updateListView();
+		super.onResume();
+	}
 
 	/*
 	 * Refreshes the contents of the listview
@@ -39,8 +62,13 @@ public class Launcher extends Activity {
 			HashMap<String, Object> temp = al.get(i);
 			String number = (String) temp.get("number");
 			if (!number.equals("Me")) {
-				number = this.getContactName(number);
-				temp.put("name", number);
+				if (temp.get("lasttime") != null) {
+					String contact = this.getContactName(number);
+					contact += " (" + Launcher.dbhdr.unreadCount(number) + ")";
+					temp.put("name", contact);
+				} else {
+					temp.put("name", "New message");
+				}
 			}
 			al.set(i, temp);
 		}
