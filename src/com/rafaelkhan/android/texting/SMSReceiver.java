@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.widget.Toast;
 
 public class SMSReceiver extends BroadcastReceiver {
 
@@ -41,7 +40,6 @@ public class SMSReceiver extends BroadcastReceiver {
 			Bundle b = new Bundle();
 			b.putString("phone number", sender);
 			b.putString("message", smsStrings[0]);
-			Toast.makeText(context, "got sms", 0).show();
 			// Intent i = new Intent(context, NotificationService.class);
 			// i.putExtras(b);
 			// context.startService(i);

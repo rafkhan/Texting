@@ -15,19 +15,18 @@ public final class R {
         public static final int icon=0x7f020001;
     }
     public static final class id {
-        public static final int all_thread_listview=0x7f050005;
+        public static final int all_thread_listview=0x7f050003;
         public static final int contact_textview=0x7f050000;
-        public static final int lastmsg_textview=0x7f050003;
-        public static final int lasttime_textview=0x7f050004;
-        public static final int linearLayout1=0x7f050001;
-        public static final int message_tv=0x7f050007;
-        public static final int phone_number_input=0x7f050009;
-        public static final int relativeLayout1=0x7f050002;
-        public static final int send_button=0x7f05000b;
-        public static final int sender_tv=0x7f050006;
-        public static final int sms_input=0x7f05000c;
-        public static final int sms_thread_list=0x7f05000a;
-        public static final int time_tv=0x7f050008;
+        public static final int lastmsg_textview=0x7f050001;
+        public static final int lasttime_textview=0x7f050002;
+        public static final int message_tv=0x7f050005;
+        public static final int phone_number_input=0x7f050007;
+        public static final int relativeLayout1=0x7f050009;
+        public static final int send_button=0x7f05000a;
+        public static final int sender_tv=0x7f050004;
+        public static final int sms_input=0x7f05000b;
+        public static final int sms_thread_list=0x7f050008;
+        public static final int time_tv=0x7f050006;
     }
     public static final class layout {
         public static final int all_thread_listitem=0x7f030000;

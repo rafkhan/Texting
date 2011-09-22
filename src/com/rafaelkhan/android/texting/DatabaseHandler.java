@@ -26,7 +26,9 @@ import android.widget.Toast;
  * 	2. Then adds the thread to the table with all Threads names and info
  * 
  * 
- * THIS ALSO HANDLES CONTACT NAME LOOKUP
+ * NOTE: 1 = unread
+ * 		 0 = read
+ * 
  */
 public class DatabaseHandler {
 
@@ -34,7 +36,6 @@ public class DatabaseHandler {
 	private String allThreadTables = "allthreads";
 	private SQLiteDatabase db;
 	private Context context;
-	private String contactName;
 
 	public DatabaseHandler(Context c) {
 		this.context = c;

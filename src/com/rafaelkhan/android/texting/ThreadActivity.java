@@ -27,6 +27,7 @@ public class ThreadActivity extends Activity {
 
 	/*
 	 * TODO: Make listview start at the bottom
+	 * TODO: MAKE READ / UNREAD SHIT
 	 */
 
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
@@ -66,7 +67,6 @@ public class ThreadActivity extends Activity {
 	 * Refreshes the contents of the listview, and gets the contact name
 	 */
 	private void updateListView() {
-		Toast.makeText(this, "fgsfds", 0).show();
 		ArrayList<HashMap<String, String>> al = Launcher.dbhdr
 				.getMessageThread(this.number);
 
@@ -87,11 +87,13 @@ public class ThreadActivity extends Activity {
 		}
 
 		ListView lv = (ListView) findViewById(R.id.sms_thread_list);
+		lv.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 		SimpleAdapter adapter = new SimpleAdapter(this, al,
 				R.layout.sms_list_item, new String[] { "number", "lastmsg",
 						"lasttime" }, new int[] { R.id.sender_tv,
 						R.id.message_tv, R.id.time_tv });
 		lv.setAdapter(adapter);
+		lv.setSelection(adapter.getCount() - 1);
 	}
 
 	/*
@@ -199,23 +201,25 @@ public class ThreadActivity extends Activity {
 			public void onReceive(Context arg0, Intent arg1) {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
+					/*
 					Toast.makeText(getBaseContext(), "SMS sent",
 							Toast.LENGTH_SHORT).show();
+					*/
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Toast.makeText(getBaseContext(), "Generic failure",
+					Toast.makeText(getBaseContext(), "ERROR: Generic failure",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(), "No service",
+					Toast.makeText(getBaseContext(), "ERROR: No service",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_NULL_PDU:
-					Toast.makeText(getBaseContext(), "Null PDU",
+					Toast.makeText(getBaseContext(), "ERROR: Null PDU",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					Toast.makeText(getBaseContext(), "Radio off",
+					Toast.makeText(getBaseContext(), "ERROR: Radio off",
 							Toast.LENGTH_SHORT).show();
 					break;
 				}
@@ -227,11 +231,13 @@ public class ThreadActivity extends Activity {
 			public void onReceive(Context arg0, Intent arg1) {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
+					/*
 					Toast.makeText(getBaseContext(), "SMS delivered",
 							Toast.LENGTH_SHORT).show();
+					*/
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), "SMS not delivered",
+					Toast.makeText(getBaseContext(), "ERROR: SMS not delivered",
 							Toast.LENGTH_SHORT).show();
 					break;
 				}
